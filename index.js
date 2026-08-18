@@ -6,16 +6,17 @@ dotenv.config();
 
 //auth routes
 const authRoutes = require("./routes/auth");
-
 //admin routes
 const adminRoutes = require("./routes/admin");
+//post routes
+const postRoutes = require("./routes/posts");
 
 const app = express();
-
 app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
+app.use("/posts", postRoutes);
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
