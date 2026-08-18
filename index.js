@@ -4,14 +4,18 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-//route
+//auth routes
 const authRoutes = require("./routes/auth");
+
+//admin routes
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 
 app.use(express.json());
 
 app.use("/auth", authRoutes);
+app.use("/admin", adminRoutes);
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
