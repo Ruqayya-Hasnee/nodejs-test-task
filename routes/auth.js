@@ -47,8 +47,12 @@ router.post("/login", async (req, res) => {
         const validPass = await bcrypt.compare(req.body.password, user.password);
         if (!validPass) return res.status(400).send("Invalid password");
 
+        if (user.status === "rejected") {
+            return res.status(403).send("Your account has been rejected by admin");
+        }
+
         if (user.status !== "approved") {
-            return res.status(403).send("Verifyy your account frm admin");
+            return res.status(403).send("Verify your account from admin");
         }
 
         const token = jwt.sign(

@@ -48,18 +48,48 @@ router.get("/users", auth, admin, async (req, res) => {
     }
 });
 
-//approve user
-router.patch("/users/:id/approve", auth, admin, async (req, res) => {
+//approve or reject user
+router.patch("/users/:id/status", auth, admin, async (req, res) => {
+    try {
+        const { status } = req.body;
+        if (status !== "approved" && status !== "rejected") {
+            return res.status(400).send("Status must be approved or rejected");
+        }
+
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+        if (user.role === "admin") {
+            return res.status(403).send("Cannot modify another admin");
+        }
+        user.status = status;
+
+        await user.save();
+        res.json({
+            message: `User ${status} successfully`,
+            user,
+        });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+//delete user
+router.delete("/users/:id", auth, admin, async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) {
             return res.status(404).send("User not found");
         }
-        user.status = "approved";
+        if (user.role === "admin") {
+            return res.status(403).send("Cannot delete another admin");
+        }
 
-        await user.save();
+        await user.deleteOne();
+
         res.json({
-            message: "User approved successfully",
+            message: "User deleted successfully",
             user,
         });
     } catch (error) {
